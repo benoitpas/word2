@@ -5,13 +5,13 @@ object WordCalculator extends App {
     // if lazy is removed then words is not initialized for unit tests
     lazy val words = Source.fromResource("words.txt").getLines.toList.toSet
 
-    val rc = recCombinations("window")
+    val rc = recCombinations("apple")
     val rcSorted = rc.map(l => (l.length, l)).sortBy(-_._1)
     println(rcSorted)
 
-    def removeLetter(w: String, i: Int) = w.substring(0, i - 1) + w.substring(i, w.length)
+    def removeLetter(w: String, i: Int) : String = w.substring(0, i - 1) + w.substring(i, w.length)
 
-    def expand(w: String) = (1 to w.length) map (l => removeLetter(w, l))
+    def expand(w: String) : IndexedSeq[String] = (1 to w.length) map (l => removeLetter(w, l))
 
     // Would It be better to return a Set to remove duplicates ?
     def combinations(w: String): IndexedSeq[String] = (1 to w.length) flatMap ((i: Int) => {
@@ -28,14 +28,21 @@ object WordCalculator extends App {
         nw.toList
     }
 
+    def expandFilter2(w: String):IndexedSeq[String] = {
+        for (w2 <- expand(w);
+             w3 <- combinations(w2)
+             if words.contains(w3))
+            yield w3
+    }
+
     def recCombinations(w: String): List[List[String]] = {
 
         val nw = expandFilter(w)
-        println(nw)
         nw match {
             case _ :: _ => nw.flatMap(w2 => (recCombinations(w2).map(lw => w :: lw)))
-            case _ => List(nw)
+            case _ => List(List(w))
         }
 
     }
+
 }
