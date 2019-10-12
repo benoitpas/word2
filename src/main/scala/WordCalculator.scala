@@ -1,17 +1,23 @@
 object WordCalculator extends App {
 
+    /**
+      * Naive implementation, does not scale (returns all combinations)
+      * As only the longest is necessary, using backtracking to find only 1 combination is probably enough (and more efficient !)
+      */
+
     import scala.io.Source
 
     // if lazy is removed then words is not initialized for unit tests
-    lazy val words = Source.fromResource("words.txt").getLines.toList.toSet
+    lazy val words = Source.fromResource("enable1.txt").getLines.toList.toSet
 
     val rc = recCombinations("apple")
     val rcSorted = rc.map(l => (l.length, l)).sortBy(-_._1)
     println(rcSorted)
+    println(funnel2("bbbb"))
 
-    def removeLetter(w: String, i: Int) : String = w.substring(0, i - 1) + w.substring(i, w.length)
+    def removeLetter(w: String, i: Int): String = w.substring(0, i - 1) + w.substring(i, w.length)
 
-    def expand(w: String) : IndexedSeq[String] = (1 to w.length) map (l => removeLetter(w, l))
+    def expand(w: String): IndexedSeq[String] = (1 to w.length) map (l => removeLetter(w, l))
 
     // Would It be better to return a Set to remove duplicates ?
     def combinations(w: String): IndexedSeq[String] = (1 to w.length) flatMap ((i: Int) => {
@@ -28,7 +34,7 @@ object WordCalculator extends App {
         nw.toList
     }
 
-    def expandFilter2(w: String):IndexedSeq[String] = {
+    def expandFilter2(w: String): IndexedSeq[String] = {
         for (w2 <- expand(w);
              w3 <- combinations(w2)
              if words.contains(w3))
@@ -43,6 +49,15 @@ object WordCalculator extends App {
             case _ => List(List(w))
         }
 
+    }
+
+    // funnel that also changes the order of the letters at each step !!
+    def funnel2(w: String): Int = {
+        val r = recCombinations(w).map(l => (l.length, l)).sortBy(-_._1)
+        r match {
+            case h :: _ => h._1
+            case _ => 0 // shouldn't happen...
+        }
     }
 
 }
