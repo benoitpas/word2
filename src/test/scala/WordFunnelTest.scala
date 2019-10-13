@@ -59,4 +59,10 @@ class WordFunnelTest extends org.scalatest.FunSuite {
         assert(WordFunnel.funnelLength12() == List("contradictorinesses", "preformationists"))
     }
 
+    test("WordFunnelTest.funnelLength12TailRec") {
+        // Should return 6 words...
+        assert(WordFunnel.funnelLength12TailRec() == List("contradictorinesses", "preformationists"))
+    }
+
+
 }

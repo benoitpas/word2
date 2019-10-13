@@ -1,10 +1,13 @@
 import WordCalculator.{expand, words}
 
+import scala.annotation.tailrec
+
 object WordFunnel extends App {
 
     import scala.io.Source
 
-    println(funnel2steps("preformations"))
+    println(funnel2tailrec("preformations"));
+    println(nextStep(List(List("preformations"))))
     // if lazy is removed then words is not initialized for unit tests
     lazy val wordList = Source.fromResource("enable1.txt").getLines.toList
     lazy val words = wordList.toSet
@@ -29,7 +32,7 @@ object WordFunnel extends App {
 
     }
 
-    def expandFilter2Steps(w: String) = {
+    def expandFilter2Steps(w: String):List[String] = {
         val nw = expand(w)
         val nw2 = (nw flatMap expandFilter).toSet
         (nw.filter(words.contains(_)) ++ nw2).toList
@@ -65,5 +68,32 @@ object WordFunnel extends App {
     }
 
     def funnelLength12(): List[String] = wordList.filter(funnel2steps(_) == 12)
+
+    /*
+    Expand a list of funnel to the next step, remove funnels that are finished (i.e. no more next step)
+     */
+    def nextStep(funnels: List[List[String]]): List[List[String]] =
+        for (funnel <- funnels;
+            nextWord <- {
+                val oneLetterLess = expand(funnel.head)
+                val twoLetterLess = oneLetterLess flatMap expand
+                (oneLetterLess ++ twoLetterLess).toSet.filter(words.contains(_))
+            } if funnel.length > 0)
+            yield nextWord::funnel
+
+    def funnel2tailrec(w:String) = {
+        @tailrec
+        def loop(funnels: List[List[String]]) :List[List[String]]= {
+            val ns = nextStep(funnels)
+            ns match {
+                case _::_ => loop(ns)
+                case _ => funnels
+            }
+        }
+        val longestFunnel = loop(List(List(w)))
+        longestFunnel.head.length
+    }
+
+    def funnelLength12TailRec(): List[String] = wordList.filter(funnel2tailrec(_) == 12)
 
 }
