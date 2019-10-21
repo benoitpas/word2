@@ -6,8 +6,9 @@ object WordFunnel extends App {
 
     import scala.io.Source
 
-    println(funnel2tailrec("preformations"));
-    println(nextStep(List(List("preformations"))))
+    println(funnel2tailrec("preformations",2));
+    println(nextStep(List(List("preformations")),2))
+    println(nextStep(List(List("preformations")),3))
     // if lazy is removed then words is not initialized for unit tests
     lazy val wordList = Source.fromResource("enable1.txt").getLines.toList
     lazy val words = wordList.toSet
@@ -17,7 +18,7 @@ object WordFunnel extends App {
     def expand(w: String): IndexedSeq[String] = (1 to w.length) map (l => removeLetter(w, l))
 
     def expandFilter(w: String) = {
-        val nw = expand(w).filter(words.contains(_))
+        val nw = expand(w).filter(words.contains)
         nw.toList
     }
 
@@ -35,7 +36,7 @@ object WordFunnel extends App {
     def expandFilter2Steps(w: String):List[String] = {
         val nw = expand(w)
         val nw2 = (nw flatMap expandFilter).toSet
-        (nw.filter(words.contains(_)) ++ nw2).toList
+        (nw.filter(words.contains) ++ nw2).toList
     }
 
 
@@ -69,22 +70,27 @@ object WordFunnel extends App {
 
     def funnelLength12(): List[String] = wordList.filter(funnel2steps(_) == 12)
 
+    def nextWords(word: String, depth: Int): Set[String] = if (depth > 0 && word.length > 2) {
+        val oneLessLess = expand(word)
+        oneLessLess.toSet ++ (oneLessLess.flatMap(nextWords(_,depth - 1))).toSet
+    }
+    else 
+        Set()
+
+
     /*
     Expand a list of funnel to the next step, remove funnels that are finished (i.e. no more next step)
      */
-    def nextStep(funnels: List[List[String]]): List[List[String]] =
+    def nextStep(funnels: List[List[String]], depth: Int): List[List[String]] =
         for (funnel <- funnels;
-            nextWord <- {
-                val oneLetterLess = expand(funnel.head)
-                val twoLetterLess = oneLetterLess flatMap expand
-                (oneLetterLess ++ twoLetterLess).toSet.filter(words.contains(_))
-            } if funnel.length > 0)
+            nextWord <- nextWords(funnel.head, depth).filter(words.contains)
+                if funnel.length > 0)
             yield nextWord::funnel
 
-    def funnel2tailrec(w:String) = {
+    def funnel2tailrec(w:String, depth: Int) = {
         @tailrec
         def loop(funnels: List[List[String]]) :List[List[String]]= {
-            val ns = nextStep(funnels)
+            val ns = nextStep(funnels, depth)
             ns match {
                 case _::_ => loop(ns)
                 case _ => funnels
@@ -94,6 +100,9 @@ object WordFunnel extends App {
         longestFunnel.head.length
     }
 
-    def funnelLength12TailRec(): List[String] = wordList.filter(funnel2tailrec(_) == 12)
+    def funnelLength12TailRec(depth: Int): List[String] = {
+        val n = 12
+        wordList.filter(w => w.length >= n && funnel2tailrec(w, depth) == n)
+    }
 
 }

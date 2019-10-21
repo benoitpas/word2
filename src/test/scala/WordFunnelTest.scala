@@ -35,6 +35,13 @@ class WordFunnelTest extends org.scalatest.FunSuite {
             List("radio", "rad", "ad")))
     }
 
+    test("WordFunnelText.nextWords") {
+        assert(WordFunnel.nextWords("radio",0) == Set())
+        assert(WordFunnel.nextWords("radio",1) == Set("adio","rdio","raio","rado","radi"))
+        assert(WordFunnel.nextWords("radio",2) == Set("rad", "rdio", "dio", "rado", "aio", "rdi", "adi", "rao", "radi", "raio", "adio", "rio", "ado", 
+        "rai", "rdo"))
+    }
+
 
     test("WordFunnelTest.funnel2") {
         assert(WordFunnel.funnel2("gnash") == 4)
@@ -44,27 +51,30 @@ class WordFunnelTest extends org.scalatest.FunSuite {
         assert(WordFunnel.funnel2("programmer") == 2)
     }
 
-    /* times out travis ci
 
-test("WordFunnelTest.funnel2steps") {
-    assert(WordFunnel.funnel2steps("programmer") == 3)
-    assert(WordFunnel.funnel2steps("preformationists") == 12)
-}
+    test("WordFunnelTest.funnel2steps") {
+        assert(WordFunnel.funnel2steps("programmer") == 3)
+        assert(WordFunnel.funnel2steps("preformationists") == 12)
+    }
 
-test("WordFunnelTest.funnelLength10") {
-    assert(WordFunnel.funnelLength10() == "complecting")
-}
+    test("WordFunnelTest.funnelLength10") {
+        assert(WordFunnel.funnelLength10() == "complecting")
+    }
+/*
+    test("WordFunnelTest.funnelLength12") {
+        assert(WordFunnel.funnelLength12() == List("contradictorinesses", "preformationists"))
+    }
 
-test("WordFunnelTest.funnelLength12") {
-    // Should return 6 words...
-    assert(WordFunnel.funnelLength12() == List("contradictorinesses", "preformationists"))
-}
+    test("WordFunnelTest.funnelLength12TailRec.2") {
+        assert(WordFunnel.funnelLength12TailRec(2) == List("contradictorinesses", "preformationists"))
+    }
 
-test("WordFunnelTest.funnelLength12TailRec") {
-    // Should return 6 words...
-    assert(WordFunnel.funnelLength12TailRec() == List("contradictorinesses", "preformationists"))
-}
+    test("WordFunnelTest.funnelLength12TailRec.3") {
+        assert(WordFunnel.funnelLength12TailRec(3) == List("contradictorinesses", "noncooperationists", "preformationists"))
+    }
+
+    test("WordFunnelTest.funnelLength12TailRec.4") {
+        assert(WordFunnel.funnelLength12TailRec(4) == List("contradictorinesses", "noncooperationists", "preformationists"))
+    }
 */
-
-
 }
