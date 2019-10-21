@@ -34,7 +34,7 @@ class WordCalculatorTest extends org.scalatest.FunSuite {
         assert(WordCalculator.recCombinations("at") === List(List("at")))
         assert(WordCalculator.recCombinations("cat") === List(List("cat","at"),List("cat","ta")))
     }
-
+/*
     test("WordCalculatorTest.funnel2") {
         assert(WordCalculator.funnel2("gnash") == 4)
         assert(WordCalculator.funnel2("princesses") == 9)
@@ -42,4 +42,5 @@ class WordCalculatorTest extends org.scalatest.FunSuite {
         assert(WordCalculator.funnel2("implosive") == 1)
  //       assert(WordCalculator.funnel2("programmer") == 2)
     }
+    */
 }
