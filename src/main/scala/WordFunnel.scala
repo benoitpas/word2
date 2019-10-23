@@ -6,6 +6,7 @@ object WordFunnel extends App {
 
     import scala.io.Source
 
+    println(funnel2("preformations",2));
     println(funnel2tailrec("preformations",2));
     println(nextStep(List(List("preformations")),2))
     println(nextStep(List(List("preformations")),3))
@@ -104,5 +105,31 @@ object WordFunnel extends App {
         val n = 12
         wordList.filter(w => w.length >= n && funnel2tailrec(w, depth) == n)
     }
+
+    /* only compute funnel length and memoize the results */
+
+    def memoize[I, O](f: I => O): I => O = new scala.collection.mutable.HashMap[I, O]() {
+        self =>
+        override def apply(key: I) = self.synchronized(getOrElseUpdate(key, f(key)))
+    }
+
+    lazy val nextWordsFiltered: ((String, Int)) => Set[String] = memoize {
+        case (word, depth) => nextWords(word, depth).intersect(words)
+    }
+
+    lazy val funnel2: ((String, Int)) => Int = memoize {
+        case (word, depth) => {
+            val moreWords = nextWordsFiltered(word, depth)
+            val depths = moreWords.map(funnel2(_, depth))
+            (1 + depths.fold(0)(math.max))
+        }
+    }
+
+    def funnelLength12TailRec2(depth: Int): List[String] = {
+        val n = 12
+        wordList.filter(w => w.length >= n && funnel2(w, depth) == n)
+    }
+
+
 
 }
